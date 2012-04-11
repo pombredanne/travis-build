@@ -1,5 +1,7 @@
 require 'travis/support'
 require 'hashr'
+require 'core_ext/hash/slice'
+require 'core_ext/hash/deep_merge'
 
 module Travis
   class Build
@@ -54,8 +56,9 @@ module Travis
 
         def test
           @test ||= begin
-            type   = Job::Test.by_lang(payload.config.language)
-            config = type::Config.new(payload.config)
+            type = Job::Test.by_lang(payload.config.language)
+            config = self.config.slice(:timeouts).deep_merge(payload.config)
+            config = type::Config.new(config)
             type.new(shell, commit, config)
           end
         end

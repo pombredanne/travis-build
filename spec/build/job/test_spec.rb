@@ -5,7 +5,7 @@ require 'hashr'
 describe Travis::Build::Job::Test do
   let(:shell)  { stub('shell', :chdir => true, :export_line => true, :execute => true, :cwd => '~/builds', :file_exists? => true, :echo => nil) }
   let(:commit) { stub(:checkout => true) }
-  let(:config) { Hashr.new(:env => 'FOO=foo', :script => 'rake') }
+  let(:config) { Hashr.new(:env => 'FOO=foo', :script => 'rake', :timeouts => { :before_script => 100, :script => 600 }) }
   let(:job)    { Travis::Build::Job::Test.new(shell, commit, config) }
 
   describe 'by_lang' do
@@ -82,12 +82,12 @@ describe Travis::Build::Job::Test do
     end
 
     it 'returns { :status => 0 } if the last script returned true' do
-      shell.expects(:execute).with('rake', :stage => :script).returns(true)
+      shell.expects(:execute).with('rake', :timeout => 600).returns(true)
       job.run.should == { :status => 0 }
     end
 
     it 'returns { :status => 1 } if the last script returned false' do
-      shell.expects(:execute).with('rake', :stage => :script).returns(false)
+      shell.expects(:execute).with('rake', :timeout => 600).returns(false)
       job.run.should == { :status => 1 }
     end
 
@@ -197,7 +197,7 @@ describe Travis::Build::Job::Test do
       it 'echos a message to the shell' do
         job.config.before_script = './before'
 
-        shell.expects(:execute).with('./before', { :stage => :before_script }).returns(false)
+        shell.expects(:execute).with('./before', { :timeout => 100 }).returns(false)
         shell.expects(:echo).with("\n\nbefore_script: './before' returned false.")
 
         job.send(:run_command, :before_script, './before')

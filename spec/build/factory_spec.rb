@@ -10,7 +10,7 @@ describe Travis::Build::Factory do
   let(:vm)         { stub('vm', :name => 'worker-1') }
   let(:shell)      { stub('shell') }
   let(:observer)   { stub('observer') }
-  let(:config)     { {} }
+  let(:config)     { { :timeouts => { :script => 600 } } }
 
   let(:build)      { Travis::Build.create(vm, shell, [observer], payload, config) }
 
@@ -154,7 +154,11 @@ describe Travis::Build::Factory do
       end
 
       it 'has the test config from the payload' do
-        job.config.should == { :rvm => '1.9.2', :gemfile => 'Gemfile', :env => 'FOO=foo' }
+        job.config.slice(:rvm, :gemfile, :env).should == { :rvm => '1.9.2', :gemfile => 'Gemfile', :env => 'FOO=foo' }
+      end
+
+      it 'has the timeouts from the worker config' do
+        job.config.slice(:timeouts).should == { :timeouts => { :script => 600 } }
       end
     end
 

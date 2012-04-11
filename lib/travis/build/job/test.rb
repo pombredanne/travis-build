@@ -139,7 +139,8 @@ module Travis
           end
 
           def run_command(stage, command)
-            result = shell.execute(command, :stage => stage)
+            timeout = config.timeouts[stage]
+            result = shell.execute(command, :timeout => timeout)
             shell.echo "\n\n#{stage}: '#{command}' returned false." if !result && stage != :script
             result
           end

@@ -43,8 +43,9 @@ When /^it starts a job$/ do
   $vm       = Mocks::Vm.new
   $shell    = Mocks::Shell.new
   $observer = Mocks::Observer.new
+  $config   = { :timeouts => { :before_install => 300, :install => 300, :before_script => 300, :script => 600, :after_script => 120 } }
   $sequence = sequence('build')
-  $build    = Travis::Build.create($vm, $shell, [$observer], $payload, {})
+  $build    = Travis::Build.create($vm, $shell, [$observer], $payload, $config)
 
   step 'it opens the ssh session'
   step 'it cds into the builds dir'
@@ -252,7 +253,7 @@ Then /^it (successfully|fails to) installs? dependencies with (.*)$/ do |result,
   cmd = cmds[dependencies]
 
   $shell.expects(:execute).
-    with(cmd, :stage => :install).
+    with(cmd, :timeout => $config[:timeouts][:install]).
     outputs(cmd).
     returns(result == 'successfully').
     in_sequence($sequence)
@@ -260,7 +261,7 @@ end
 
 Then /^it (successfully|fails to) runs? the (.*): (.*)$/ do |result, type, command|
   $shell.expects(:execute).
-    with(command, :stage => type.to_sym).
+    with(command, :timeout => $config[:timeouts][type.to_sym]).
     outputs(command).
     returns(result == 'successfully').
     in_sequence($sequence)
