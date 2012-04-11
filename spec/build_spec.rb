@@ -45,9 +45,9 @@ describe Travis::Build do
 
     describe 'with a command timeout exception being raised' do
       it 'logs the exception' do
-        job.stubs(:run).raises(Travis::Build::CommandTimeout.new(:script, 'rake', 1000))
+        job.stubs(:run).raises(Travis::Build::CommandTimeout.new('rake', 1000))
         build.run
-        observer.events.should include_event('job:configure:log', :log => /Executing your script \(rake\) took longer than 1000 seconds/)
+        observer.events.should include_event('job:configure:log', :log => /Executing "rake" took longer than 1000 seconds/)
       end
     end
 
