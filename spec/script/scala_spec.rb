@@ -11,38 +11,29 @@ describe Travis::Build::Script::Scala do
   end
 
   it_behaves_like 'a build script'
-  # it_behaves_like 'a jdk build'
+  it_behaves_like 'a jvm build'
 
   it 'sets TRAVIS_SCALA_VERSION' do
-    should set 'TRAVIS_SCALA_VERSION', '2.10.0'
+    should set 'TRAVIS_SCALA_VERSION', '2.10.3'
   end
 
-  it 'announces Scala 2.10.0' do
-    should run 'echo Using Scala 2.10.0'
+  it 'announces Scala 2.10.3' do
+    should run 'echo Using Scala 2.10.3'
   end
 
-  it 'runs sbt ++2.10.0 test if ./project directory exists' do
+  it 'runs sbt ++2.10.3 test if ./project directory exists' do
     directory('project')
-    should run_script 'sbt ++2.10.0 test'
+    should run_script 'sbt ++2.10.3 test'
   end
 
-  it 'runs sbt ++2.10.0 test if ./build.sbt exists' do
+  it 'runs sbt ++2.10.3 test if ./build.sbt exists' do
     file('build.sbt')
-    should run_script 'sbt ++2.10.0 test'
-  end
-
-  it 'runs gradle check if ./build.gradle exists' do
-    file('build.gradle')
-    should run_script 'gradle check'
-  end
-
-  it 'runs mvn test if no project directory or build file exists' do
-    should run_script 'mvn test'
+    should run_script 'sbt ++2.10.3 test'
   end
 
   it "runs sbt with sbt_args if they are given" do
     file("build.sbt")
     data["config"]["sbt_args"] = "-Dsbt.log.noformat=true"
-    should run_script "sbt -Dsbt.log.noformat=true ++2.10.0 test"
+    should run_script "sbt -Dsbt.log.noformat=true ++2.10.3 test"
   end
 end

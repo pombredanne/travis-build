@@ -1,13 +1,16 @@
 module Travis
   module Build
     class Script
-      class Scala < Script
-        include Jdk
+      class Scala < Jvm
 
         DEFAULTS = {
-          scala: '2.10.0',
+          scala: '2.10.3',
           jdk:   'default'
         }
+
+        def cache_slug
+          super << "--scala-" << config[:scala].to_s
+        end
 
         def export
           super
@@ -15,13 +18,17 @@ module Travis
         end
 
         def announce
+          super
           echo "Using Scala #{config[:scala]}"
+        end
+
+        def install
+          self.if  ('! -d project && ! -f build.sbt') { super }
         end
 
         def script
           self.if   '-d project || -f build.sbt', "sbt#{sbt_args} ++#{config[:scala]} test"
-          self.elif '-f build.gradle', 'gradle check'
-          self.else 'mvn test'
+          self.else { super }
         end
 
         private

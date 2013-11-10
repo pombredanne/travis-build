@@ -41,6 +41,8 @@ module Travis
         end
 
         def after_result
+          run_builtin_stage(:finish)
+
           self.if('$TRAVIS_TEST_RESULT = 0') do
             run_stage(:after_success)
             run_stage(:deploy)
